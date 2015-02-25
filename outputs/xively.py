@@ -8,7 +8,10 @@ class Xively(output.Output):
 	def __init__(self,data):
 		self.APIKey=data["APIKey"]
 		self.FeedID=data["FeedID"]
+
 	def outputData(self,dataPoints):
+		print "Outputting to Xively"
+
 		arr = []
 		for i in dataPoints:
 			arr.append({"id":i["name"],"current_value":i["value"]})
@@ -20,4 +23,5 @@ class Xively(output.Output):
 				return False
 		except Exception:
 			return False
+
 		return True

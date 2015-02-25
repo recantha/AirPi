@@ -10,7 +10,8 @@ class Print(output.Output):
 		self.url_root = data["url_root"]
 
 	def outputData(self,dataPoints):
-		print ""
+		print "Outputting to HTTP"
+
 		theDateTime = str(datetime.datetime.now())
 		print "Time: " + theDateTime
 
@@ -23,6 +24,10 @@ class Print(output.Output):
 		full_url = self.url_root + "?" + urlString
 		print full_url
 
-		r = requests.get(full_url)
+		try:
+			r = requests.get(full_url)
+			return True
 
-		return True
+		except:
+			return False
+

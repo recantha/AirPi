@@ -34,6 +34,8 @@ for i in sensorNames:
 	try:	
 		try:
 			filename = sensorConfig.get(i,"filename")
+			print(filename)
+
 		except Exception:
 			print("Error: no filename config option found for sensor plugin " + i)
 			raise
@@ -83,6 +85,7 @@ for i in sensorNames:
 			instClass = sensorClass(pluginData)
 			sensorPlugins.append(instClass)
 			print ("Success: Loaded sensor plugin " + i)
+
 	except Exception as e: #add specific exception for missing module
 		print("Error: Did not import sensor plugin " + i )
 		raise e
@@ -172,12 +175,14 @@ redPin = mainConfig.getint("Main","redPin")
 greenPin = mainConfig.getint("Main","greenPin")
 GPIO.setup(redPin,GPIO.OUT,initial=GPIO.LOW)
 GPIO.setup(greenPin,GPIO.OUT,initial=GPIO.LOW)
+
 while True:
 	curTime = time.time()
 	if (curTime-lastUpdated)>delayTime:
 		lastUpdated = curTime
 		data = []
-		#Collect the data from each sensor
+
+		# Collect the data from each sensor
 		for i in sensorPlugins:
 			dataDict = {}
 			val = i.getVal()
@@ -189,15 +194,20 @@ while True:
 			dataDict["name"] = i.valName
 			dataDict["sensor"] = i.sensorName
 			data.append(dataDict)
+
 		working = True
 		for i in outputPlugins:
-			working = working and i.outputData(data)
-		if working:
-			print "Uploaded successfully"
-			GPIO.output(greenPin,GPIO.HIGH)
-		else:
-			print "Failed to upload"
-			GPIO.output(redPin,GPIO.HIGH)
+			working = i.outputData(data)
+
+			if working:
+				print "Uploaded successfully"
+				GPIO.output(greenPin,GPIO.HIGH)
+
+			else:
+				print "Failed to upload"
+				GPIO.output(redPin,GPIO.HIGH)
+
 		time.sleep(1)
+
 		GPIO.output(greenPin,GPIO.LOW)
 		GPIO.output(redPin,GPIO.LOW)
